@@ -104,7 +104,15 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal)
   */
 SistLinear_t* alocaSistLinear (unsigned int n)
 {
+  SistLinear_t *SL = (SistLinear_t*)malloc(sizeof(SistLinear_t));
+  SL->A = (real_t **)malloc(n*sizeof(real_t*));
+  for(int i=0; i<n; i++) SL->A[i] = (real_t *) malloc(n*sizeof(real_t));
+  SL->b = (real_t *)malloc(n*sizeof(real_t));
 
+  if(SL == NULL || SL->A == NULL || SL->b == NULL)
+    return NULL;
+  else
+    return SL;
 
 }
 
@@ -115,7 +123,10 @@ SistLinear_t* alocaSistLinear (unsigned int n)
   */
 void liberaSistLinear (SistLinear_t *SL)
 {
-
+  for(int i=0; i<SL->n; i++) free(SL->A[i]);
+  free(SL->A);
+  free(SL->b);
+  free(SL);
 
 }
 
@@ -126,19 +137,52 @@ void liberaSistLinear (SistLinear_t *SL)
   */
 SistLinear_t *lerSistLinear ()
 {
-  
+  //*******falta checar erro de leitura
+  int num; real_t erro;
+  scanf("%d %f", &num, &erro);
+  while((getchar()) != '\n');//limpando buffer
+
+  SistLinear_t *SL = alocaSistLinear(num);
+  if(SL == NULL) return NULL;
+  SL->n = num;
+  SL->erro = erro;
+
+  for(int i=0; i<SL->n; i++){
+    for(int j=0; j<SL->n; j++)
+      scanf("%f", &SL->A[i][j]);
+    while((getchar()) != '\n');//limpando buffer
+  }
+
+  for(int i=0; i<SL->n; i++)
+    scanf("%f", &SL->b[i]);
+
+  return SL;
+
 }
 
 
 // Exibe SL na saída padrão
 void prnSistLinear (SistLinear_t *SL)
 {
+  for(int i=0; i<SL->n; i++){
+    for(int j=0; j<SL->n; j++){
+      printf("%f ", SL->A[i][j]);
+    }
+    printf("\n");
+
+  }
+  for(int i=0; i<SL->n; i++)
+    printf("%f ", SL->b[i]);
+  printf("\n");
 
 }
 
 // Exibe um vetor na saída padrão
 void prnVetor (real_t *v, unsigned int n)
 {
-
+  printf("\n");
+  for(int i=0; i<n; i++)
+    printf("%f ", v[i]);
+  printf("\n");
 }
 
