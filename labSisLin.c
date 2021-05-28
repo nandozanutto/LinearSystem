@@ -14,7 +14,9 @@ int main ()
     double *tTotal;
     SistLinear_t *SL = lerSistLinear();
     prnSistLinear(SL);
-    x = multiMatrix(SL, SL->b);
+    eliminacaoGauss(SL, x, tTotal);
+    prnVetor(x, 4);
+    refinamento(SL, x, tTotal);
     prnVetor(x, 4);
 
 }

@@ -136,22 +136,41 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal)
   */
 
 
-real_t * multiMatrix(SistLinear_t *SL, real_t *x){
+void multiMatrix(SistLinear_t *SL, real_t *x, real_t *sol){
   //sol = [A].[X]
-  real_t *sol;
-  sol = (real_t *)calloc(SL->n, sizeof(real_t));
-  
+  for(int i=0; i<SL->n; i++)
+    sol[i] = 0;
+
   for (int i = 0; i < SL->n; ++i) {
     for (int k = 0; k < SL->n; ++k)
       sol[i] += SL->A[i][k] * x[k];
   }
 
-  return sol;
 }   
   
 int refinamento (SistLinear_t *SL, real_t *x, double *tTotal)
 {
   //calculando resíduo
+  real_t *aux;//A*X
+  real_t *w;
+  real_t *r;
+  aux = (real_t *)malloc(SL->n*sizeof(real_t));
+  w = (real_t *)malloc(SL->n*sizeof(real_t));//residuo
+  r = (real_t *)malloc(SL->n*sizeof(real_t));//residuo
+  
+  multiMatrix(SL, x, aux);
+  for(int i=0; i<SL->n; i++)
+    r[i] = SL->b[i] - aux[i];
+  
+  SistLinear_t *newSL = alocaSistLinear(SL->n);
+  for(int i=0; i<SL->n; i++)
+    for(int j=0; j<SL->n; j++)
+      newSL->A[i][j] = SL->A[i][j];
+  newSL->b = r;//???
+  eliminacaoGauss(newSL, w, tTotal); //Solving A*w = r 
+  for(int i=0; i<SL->n; i++)
+    x[i] += w[i];
+
 
 }
 
@@ -242,7 +261,7 @@ void prnVetor (real_t *v, unsigned int n)
 {
   printf("\n");
   for(int i=0; i<n; i++)
-    printf("%.9g ", v[i]);
+    printf("%1.27f ", v[i]);
   printf("\n");
 }
 

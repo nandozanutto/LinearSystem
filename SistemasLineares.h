@@ -38,7 +38,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal);
 int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal);
 
 // Método de Refinamento. Valor inicial e resultado no parâmetro 'x'
-real_t * multiMatrix(SistLinear_t *SL, real_t *x);
+void multiMatrix(SistLinear_t *SL, real_t *x, real_t *sol);
 int refinamento (SistLinear_t *SL, real_t *x, double *tTotal);
 
 #endif // __SISLINEAR_H__
