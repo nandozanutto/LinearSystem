@@ -25,6 +25,9 @@ void prnVetor (real_t *vet, unsigned int n);
 // Retorna a normaL2 do resíduo. Parâmetro 'res' deve ter o resíduo.
 real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res);
 
+int encontraMax(SistLinear_t *SL, int i);
+void trocaLinha(SistLinear_t *SL, int i, int iPivo);
+void retrossubs(SistLinear_t *SL, real_t *x, int n);
 // Método da Eliminação de Gauss. Resultado no parâmetro 'x'
 int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal);
 
@@ -35,6 +38,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal);
 int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal);
 
 // Método de Refinamento. Valor inicial e resultado no parâmetro 'x'
+real_t * multiMatrix(SistLinear_t *SL, real_t *x);
 int refinamento (SistLinear_t *SL, real_t *x, double *tTotal);
 
 #endif // __SISLINEAR_H__
