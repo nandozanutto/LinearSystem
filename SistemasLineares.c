@@ -102,7 +102,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
   for(int i=0; i<SL->n; i++)
     x[i] = 0;
 
-  for(int k = 0; k<100; k++){  
+  for(int k = 0; k<7; k++){  
     
     for(int i=0; i<SL->n; i++){
       for(int j=0; j<SL->n; j++){
@@ -112,9 +112,11 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
       nextX[i] += SL->b[i];
       nextX[i] /= SL->A[i][i]; 
     }
-    prnVetor(nextX, 3);
-    for(int i=0; i<SL->n; i++)
+    prnVetor(nextX, 4);
+    for(int i=0; i<SL->n; i++){
       x[i] = nextX[i];
+      nextX[i] = 0;
+    }
 
   }
 
