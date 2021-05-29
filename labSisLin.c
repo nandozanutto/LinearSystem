@@ -9,15 +9,13 @@
 
 int main ()
 {
-
     real_t *x;
     double *tTotal;
     SistLinear_t *SL = lerSistLinear();
+    x = (real_t *)calloc(SL->n, sizeof(real_t));
     prnSistLinear(SL);
-    eliminacaoGauss(SL, x, tTotal);
-    prnVetor(x, 4);
-    refinamento(SL, x, tTotal);
-    prnVetor(x, 4);
+    gaussJacobi(SL, x, 0);
+
 
 }
 

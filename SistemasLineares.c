@@ -97,7 +97,26 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal)
 */
 int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
 {
+  real_t *nextX;
+  nextX = (real_t *)calloc(SL->n,sizeof(real_t));  
+  for(int i=0; i<SL->n; i++)
+    x[i] = 0;
 
+  for(int k = 0; k<100; k++){  
+    
+    for(int i=0; i<SL->n; i++){
+      for(int j=0; j<SL->n; j++){
+        if(i == j) continue;
+        nextX[i] += -SL->A[i][j]*x[j];
+      }
+      nextX[i] += SL->b[i];
+      nextX[i] /= SL->A[i][i]; 
+    }
+    prnVetor(nextX, 3);
+    for(int i=0; i<SL->n; i++)
+      x[i] = nextX[i];
+
+  }
 
 }
 
@@ -117,7 +136,6 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
   */
 int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal)
 {
-
 
 }
 
@@ -261,7 +279,7 @@ void prnVetor (real_t *v, unsigned int n)
 {
   printf("\n");
   for(int i=0; i<n; i++)
-    printf("%1.27f ", v[i]);
+    printf("%f ", v[i]);
   printf("\n");
 }
 
