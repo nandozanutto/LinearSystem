@@ -16,6 +16,15 @@
 */
 real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res)
 {
+  real_t norma=0;
+  real_t *aux;//A*X
+  aux = (real_t *)malloc(SL->n*sizeof(real_t));
+  multiMatrix(SL, x, aux);
+  for(int i=0; i<SL->n; i++)
+    res[i] = SL->b[i] - aux[i];
+  for(int i=0; i<SL->n; i++)
+    norma += res[i]*res[i];
+  norma = sqrt(norma);
 
 }
 
@@ -124,7 +133,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
     }
     num++;
     prnVetor(nextX, 4);
-    if(maxError(nextX, x, SL->n) <= (SL->erro)){//critério de parada
+    if((maxError(nextX, x, SL->n) <= (SL->erro)) || (num == MAXIT)){//critério de parada
       for(int i=0; i<SL->n; i++)
         x[i] = nextX[i];
       return num;//modify to number of interations
@@ -176,7 +185,7 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal)
     }
     num++;
     prnVetor(nextX, 4);
-    if(maxError(nextX, x, SL->n) <= (SL->erro)){//critério de parada
+    if((maxError(nextX, x, SL->n) <= (SL->erro)) || (num == MAXIT)){//critério de parada
       for(int i=0; i<SL->n; i++)
         x[i] = nextX[i];
       return num;//modify to number of interations
@@ -235,7 +244,9 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal)
   for(int i=0; i<SL->n; i++)
     for(int j=0; j<SL->n; j++)
       newSL->A[i][j] = SL->A[i][j];
-  newSL->b = r;//???
+  for(int i=0; i<SL->n; i++)
+    newSL->b[i] = r[i];//???
+  newSL->n = SL->n;
   eliminacaoGauss(newSL, w, tTotal); //Solving A*w = r 
   for(int i=0; i<SL->n; i++)
     x[i] += w[i];
