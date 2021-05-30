@@ -20,11 +20,18 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res)
   real_t *aux;//A*X
   aux = (real_t *)malloc(SL->n*sizeof(real_t));
   multiMatrix(SL, x, aux);
+  printf("\nvetor aux(A*x):");
+  prnVetor(aux, SL->n);
   for(int i=0; i<SL->n; i++)
     res[i] = SL->b[i] - aux[i];
   for(int i=0; i<SL->n; i++)
     norma += res[i]*res[i];
   norma = sqrt(norma);
+  printf("\nvetor b: ");
+  prnVetor(SL->b, SL->n);
+  printf("\nresiduo: ");
+  prnVetor(res, SL->n);
+  printf("\nnorma: %1.8e\n", norma);
 
 }
 
@@ -132,7 +139,6 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
       nextX[i] /= SL->A[i][i]; 
     }
     num++;
-    prnVetor(nextX, 4);
     if((maxError(nextX, x, SL->n) <= (SL->erro)) || (num == MAXIT)){//critério de parada
       for(int i=0; i<SL->n; i++)
         x[i] = nextX[i];
@@ -233,7 +239,7 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal)
   real_t *w;
   real_t *r;
   aux = (real_t *)malloc(SL->n*sizeof(real_t));
-  w = (real_t *)malloc(SL->n*sizeof(real_t));//residuo
+  w = (real_t *)calloc(SL->n, sizeof(real_t));
   r = (real_t *)malloc(SL->n*sizeof(real_t));//residuo
   
   multiMatrix(SL, x, aux);
@@ -247,6 +253,7 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal)
   for(int i=0; i<SL->n; i++)
     newSL->b[i] = r[i];//???
   newSL->n = SL->n;
+  newSL->erro = SL->erro;
   eliminacaoGauss(newSL, w, tTotal); //Solving A*w = r 
   for(int i=0; i<SL->n; i++)
     x[i] += w[i];
@@ -341,7 +348,7 @@ void prnVetor (real_t *v, unsigned int n)
 {
   printf("\n");
   for(int i=0; i<n; i++)
-    printf("%f ", v[i]);
+    printf("%1.8e ", v[i]);
   printf("\n");
 }
 
