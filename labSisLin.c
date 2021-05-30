@@ -14,8 +14,8 @@ int main ()
     SistLinear_t *SL = lerSistLinear();
     x = (real_t *)calloc(SL->n, sizeof(real_t));
     prnSistLinear(SL);
-    gaussJacobi(SL, x, 0);
-
+    printf("%d", gaussSeidel(SL, x, 0));
+    
 
 }
 

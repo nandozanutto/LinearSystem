@@ -81,6 +81,15 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal)
     retrossubs(SL, x, SL->n);
 }
 
+real_t maxError(real_t * nextX, real_t *x, int n){
+  real_t max = fabs(nextX[0] - x[0]);
+  for(int i=1; i<n; i++){
+    if(max < fabs(nextX[i] - x[i]))
+      max = fabs(nextX[i] - x[i]);
+  }
+  return max;
+}
+
 /*!
   \brief Método de Jacobi
 
@@ -98,11 +107,12 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal)
 int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
 {
   real_t *nextX;
+  int num=0;
   nextX = (real_t *)calloc(SL->n,sizeof(real_t));  
   for(int i=0; i<SL->n; i++)
     x[i] = 0;
 
-  for(int k = 0; k<7; k++){  
+  while(1){  
     
     for(int i=0; i<SL->n; i++){
       for(int j=0; j<SL->n; j++){
@@ -112,7 +122,14 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
       nextX[i] += SL->b[i];
       nextX[i] /= SL->A[i][i]; 
     }
+    num++;
     prnVetor(nextX, 4);
+    if(maxError(nextX, x, SL->n) <= (SL->erro)){//critério de parada
+      for(int i=0; i<SL->n; i++)
+        x[i] = nextX[i];
+      return num;//modify to number of interations
+    }
+    
     for(int i=0; i<SL->n; i++){
       x[i] = nextX[i];
       nextX[i] = 0;
@@ -138,7 +155,39 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
   */
 int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal)
 {
+  real_t *nextX;
+  int num=0;
+  nextX = (real_t *)calloc(SL->n,sizeof(real_t));  
+  for(int i=0; i<SL->n; i++)
+    x[i] = 0;
 
+  while(1){  
+    
+    for(int i=0; i<SL->n; i++){
+      for(int j=0; j<SL->n; j++){
+        if(i == j) continue;
+        else if(j < i)
+          nextX[i] += -SL->A[i][j]*nextX[j];//Using variables already written
+        else 
+          nextX[i] += -SL->A[i][j]*x[j];
+      }
+      nextX[i] += SL->b[i];
+      nextX[i] /= SL->A[i][i]; 
+    }
+    num++;
+    prnVetor(nextX, 4);
+    if(maxError(nextX, x, SL->n) <= (SL->erro)){//critério de parada
+      for(int i=0; i<SL->n; i++)
+        x[i] = nextX[i];
+      return num;//modify to number of interations
+    }
+    
+    for(int i=0; i<SL->n; i++){
+      x[i] = nextX[i];
+      nextX[i] = 0;
+    }
+
+  }
 }
 
 
