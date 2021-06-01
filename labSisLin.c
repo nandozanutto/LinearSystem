@@ -13,6 +13,7 @@ int main ()
     real_t *res;
     real_t norma;
     int i=0;
+    int iteracoes=0;
     double *tTotal;
     long int pos;
     char c;
@@ -22,6 +23,7 @@ int main ()
         SistLinear_t *SL = lerSistLinear();
         SistLinear_t *newSL = alocaSistLinear(SL->n);
         x = (real_t *)calloc(SL->n, sizeof(real_t));
+        tTotal = (double *)malloc(sizeof(double));
         res = (real_t *)calloc(SL->n, sizeof(real_t));
         
         //***salvando sistema original
@@ -37,37 +39,42 @@ int main ()
         i++;
         eliminacaoGauss(SL, x, tTotal); 
         printf("***** Sistema %d --> n = %d, erro: %f\n", i, SL->n, SL->erro);
-        printf("===> Eliminação Gauss: tempo\n --> X: ");
+        printf("===> Eliminação Gauss: %lf ms\n --> X: ", tTotal[0]);
         prnVetor(x, SL->n);
         norma = normaL2Residuo(newSL, x, res);
         printf(" --> Norma L2 do residuo: %.7g\n", norma);
 
         if(norma > 5.0){
-            printf("\n===> Refinamento: tempo --> %d iteracoes\n --> X: ", refinamento(newSL, x, tTotal));
+            iteracoes = refinamento(newSL, x, tTotal);
+            printf("\n===> Refinamento: %lf ms --> %d iteracoes\n --> X: ", tTotal[0], iteracoes);
             prnVetor(x, SL->n);
             norma = normaL2Residuo(newSL, x, res);
             printf(" --> Norma L2 do residuo: %.7g\n", norma);
         }
 
-        printf("\n===> Jacobi: tempo --> %d iteracoes\n --> X: ", gaussJacobi(newSL, x, tTotal));
+        iteracoes = gaussJacobi(newSL, x, tTotal);
+        printf("\n===> Jacobi: %lf ms --> %d iteracoes\n --> X: ", tTotal[0], iteracoes);
         prnVetor(x, SL->n);
         norma = normaL2Residuo(newSL, x, res);
         printf(" --> Norma L2 do residuo: %.7g\n", norma);
 
         if(norma > 5.0){
-            printf("\n===> Refinamento: tempo --> %d iteracoes\n --> X: ", refinamento(newSL, x, tTotal));
+            iteracoes = refinamento(newSL, x, tTotal);
+            printf("\n===> Refinamento: %lf ms --> %d iteracoes\n --> X: ", tTotal[0], iteracoes);
             prnVetor(x, SL->n);
             norma = normaL2Residuo(newSL, x, res);
             printf(" --> Norma L2 do residuo: %.7g\n", norma);
         }
         
-        printf("\n===> Gauss-Seidel: tempo --> %d iteracoes\n --> X: ", gaussSeidel(newSL, x, tTotal));
+        iteracoes = gaussSeidel(newSL, x, tTotal);
+        printf("\n===> Gauss-Seidel: %lf ms --> %d iteracoes\n --> X: ", tTotal[0], iteracoes);
         prnVetor(x, SL->n);
         norma = normaL2Residuo(newSL, x, res);
         printf(" --> Norma L2 do residuo: %.7g\n", norma);
 
         if(norma > 5.0){
-            printf("\n===> Refinamento: tempo --> %d iteracoes\n --> X: ", refinamento(newSL, x, tTotal));
+            iteracoes = refinamento(newSL, x, tTotal);
+            printf("\n===> Refinamento: %lf ms --> %d iteracoes\n --> X: ", tTotal[0], iteracoes);
             prnVetor(x, SL->n);
             norma = normaL2Residuo(newSL, x, res);
             printf(" --> Norma L2 do residuo: %.7g\n", norma);
@@ -80,6 +87,8 @@ int main ()
         if(c == EOF) break;
         else fseek (stdin, pos, SEEK_SET);//Number found!!
     
+        liberaSistLinear(SL);
+        liberaSistLinear(newSL);
     }
     
     

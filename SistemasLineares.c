@@ -75,6 +75,8 @@ void retrossubs(SistLinear_t *SL, real_t *x, int n){
 */
 int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal)
 {
+double tTriangulariza;
+tTriangulariza = timestamp();
 /* para cada linha a partir da primeira */   
     for (int i=0; i < SL->n; ++i) {      
 	    int iPivo = encontraMax(SL, i);      
@@ -88,7 +90,12 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal)
             SL->b[k] -= SL->b[i] * m;      
         }   
 	}
-    retrossubs(SL, x, SL->n);
+  tTriangulariza = timestamp() - tTriangulariza;
+  double tRetroSubst = timestamp();
+  retrossubs(SL, x, SL->n);
+  tRetroSubst = timestamp() - tRetroSubst;
+
+  tTotal[0] = tTriangulariza + tRetroSubst;
 }
 
 real_t maxError(real_t * nextX, real_t *x, int n){
@@ -116,6 +123,7 @@ real_t maxError(real_t * nextX, real_t *x, int n){
 */
 int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
 {
+  tTotal[0] = timestamp();
   real_t *nextX;
   int num=0;
   nextX = (real_t *)calloc(SL->n,sizeof(real_t));  
@@ -136,6 +144,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
     if((maxError(nextX, x, SL->n) <= (SL->erro)) || (num == MAXIT)){//critério de parada
       for(int i=0; i<SL->n; i++)
         x[i] = nextX[i];
+      tTotal[0] = timestamp() - tTotal[0];
       return num;//modify to number of interations
     }
     
@@ -164,6 +173,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
   */
 int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal)
 {
+  tTotal[0] = timestamp();
   real_t *nextX;
   int num=0;
   nextX = (real_t *)calloc(SL->n,sizeof(real_t));  
@@ -187,6 +197,7 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal)
     if((maxError(nextX, x, SL->n) <= (SL->erro)) || (num == MAXIT)){//critério de parada
       for(int i=0; i<SL->n; i++)
         x[i] = nextX[i];
+      tTotal[0] = timestamp() - tTotal[0];
       return num;//modify to number of interations
     }
     
@@ -227,6 +238,7 @@ void multiMatrix(SistLinear_t *SL, real_t *x, real_t *sol){
   
 int refinamento (SistLinear_t *SL, real_t *x, double *tTotal)
 {
+  double time = timestamp();
   real_t *aux, *w, *r, norma, *res;
   int iteracao=0;
   res = (real_t *)calloc(SL->n, sizeof(real_t));
@@ -257,6 +269,8 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal)
     
     norma = normaL2Residuo(SL, x, res);
   }
+  time = timestamp() - time;
+  tTotal[0] = time;
   return iteracao;
 }
 
