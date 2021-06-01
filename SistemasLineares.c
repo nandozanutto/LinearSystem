@@ -227,31 +227,37 @@ void multiMatrix(SistLinear_t *SL, real_t *x, real_t *sol){
   
 int refinamento (SistLinear_t *SL, real_t *x, double *tTotal)
 {
-  //calculando resíduo
-  real_t *aux;//A*X
-  real_t *w;
-  real_t *r;
+  real_t *aux, *w, *r, norma, *res;
+  int iteracao=0;
+  res = (real_t *)calloc(SL->n, sizeof(real_t));
   aux = (real_t *)malloc(SL->n*sizeof(real_t));
   w = (real_t *)calloc(SL->n, sizeof(real_t));
   r = (real_t *)malloc(SL->n*sizeof(real_t));//residuo
   
-  multiMatrix(SL, x, aux);
-  for(int i=0; i<SL->n; i++)
-    r[i] = SL->b[i] - aux[i];
-  
-  SistLinear_t *newSL = alocaSistLinear(SL->n);
-  for(int i=0; i<SL->n; i++)
-    for(int j=0; j<SL->n; j++)
-      newSL->A[i][j] = SL->A[i][j];
-  for(int i=0; i<SL->n; i++)
-    newSL->b[i] = r[i];//???
-  newSL->n = SL->n;
-  newSL->erro = SL->erro;
-  eliminacaoGauss(newSL, w, tTotal); //Solving A*w = r 
-  for(int i=0; i<SL->n; i++)
-    x[i] += w[i];
-
-
+  norma = normaL2Residuo(SL, x, res);
+  while(norma > 5.0){
+    iteracao++;
+    multiMatrix(SL, x, aux);
+    for(int i=0; i<SL->n; i++)
+      r[i] = SL->b[i] - aux[i];
+    
+    SistLinear_t *newSL = alocaSistLinear(SL->n);
+    for(int i=0; i<SL->n; i++)
+      for(int j=0; j<SL->n; j++)
+        newSL->A[i][j] = SL->A[i][j];
+    for(int i=0; i<SL->n; i++)
+      newSL->b[i] = r[i];
+    newSL->n = SL->n;
+    newSL->erro = SL->erro;
+    eliminacaoGauss(newSL, w, tTotal); //Solving A*w = r 
+    for(int i=0; i<SL->n; i++){
+      x[i] += w[i];
+      w[i] = 0;
+    }
+    
+    norma = normaL2Residuo(SL, x, res);
+  }
+  return iteracao;
 }
 
 /*!
@@ -340,7 +346,7 @@ void prnSistLinear (SistLinear_t *SL)
 void prnVetor (real_t *v, unsigned int n)
 {
   for(int i=0; i<n; i++)
-    printf("%1.8e ", v[i]);
+    printf("%.7g ", v[i]);
   printf("\n");
 }
 
